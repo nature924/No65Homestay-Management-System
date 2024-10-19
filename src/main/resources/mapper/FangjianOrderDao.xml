@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.FangjianOrderDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.fangjian_id as fangjianId
+        ,a.yonghu_id as yonghuId
+        ,a.fangjian_order_time as fangjianOrderTime
+        ,a.fangjian_order_text as fangjianOrderText
+        ,a.fangjian_order_types as fangjianOrderTypes
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.FangjianOrderView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,fangjian.fangjian_name as fangjianName
+        ,fangjian.fangjian_photo as fangjianPhoto
+        ,fangjian.fangjian_tese as fangjianTese
+        ,fangjian.fangjian_peizhi as fangjianPeizhi
+        ,fangjian.fangjian_shangpin as fangjianShangpin
+        ,fangjian.fangjian_fuwu as fangjianFuwu
+        ,fangjian.fangjian_money as fangjianMoney
+        ,fangjian.fangjian_types as fangjianTypes
+        ,fangjian.fangjian_number as fangjianNumber
+        ,fangjian.fangjian_clicknum as fangjianClicknum
+        ,fangjian.fangjian_content as fangjianContent
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_email as yonghuEmail
+        ,yonghu.new_money as newMoney
+        ,yonghu.yonghu_delete as yonghuDelete
+
+        FROM fangjian_order  a
+        left JOIN fangjian fangjian ON a.fangjian_id = fangjian.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.fangjianId != null and params.fangjianId != ''">
+                and (
+                    a.fangjian_id = #{params.fangjianId}
+                )
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.fangjianOrderTimeStart != '' and params.fangjianOrderTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.fangjian_order_time) >= UNIX_TIMESTAMP(#{params.fangjianOrderTimeStart}) ]]>
+            </if>
+            <if test=" params.fangjianOrderTimeEnd != '' and params.fangjianOrderTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.fangjian_order_time) <= UNIX_TIMESTAMP(#{params.fangjianOrderTimeEnd}) ]]>
+            </if>
+            <if test=" params.fangjianOrderText != '' and params.fangjianOrderText != null and params.fangjianOrderText != 'null' ">
+                and a.fangjian_order_text like CONCAT('%',#{params.fangjianOrderText},'%')
+            </if>
+            <if test="params.fangjianOrderTypes != null and params.fangjianOrderTypes != ''">
+                and a.fangjian_order_types = #{params.fangjianOrderTypes}
+            </if>
+
+                <!-- 判断房间信息的id不为空 -->
+            <if test=" params.fangjianIdNotNull != '' and params.fangjianIdNotNull != null and params.fangjianIdNotNull != 'null' ">
+                and a.fangjian_id IS NOT NULL
+            </if>
+            <if test=" params.fangjianName != '' and params.fangjianName != null and params.fangjianName != 'null' ">
+                and fangjian.fangjian_name like CONCAT('%',#{params.fangjianName},'%')
+            </if>
+            <if test=" params.fangjianTese != '' and params.fangjianTese != null and params.fangjianTese != 'null' ">
+                and fangjian.fangjian_tese like CONCAT('%',#{params.fangjianTese},'%')
+            </if>
+            <if test=" params.fangjianPeizhi != '' and params.fangjianPeizhi != null and params.fangjianPeizhi != 'null' ">
+                and fangjian.fangjian_peizhi like CONCAT('%',#{params.fangjianPeizhi},'%')
+            </if>
+            <if test=" params.fangjianShangpin != '' and params.fangjianShangpin != null and params.fangjianShangpin != 'null' ">
+                and fangjian.fangjian_shangpin like CONCAT('%',#{params.fangjianShangpin},'%')
+            </if>
+            <if test=" params.fangjianFuwu != '' and params.fangjianFuwu != null and params.fangjianFuwu != 'null' ">
+                and fangjian.fangjian_fuwu like CONCAT('%',#{params.fangjianFuwu},'%')
+            </if>
+            <if test="params.fangjianMoneyStart != null ">
+                <![CDATA[  and fangjian.fangjian_money >= #{params.fangjianMoneyStart}   ]]>
+            </if>
+            <if test="params.fangjianMoneyEnd != null ">
+                <![CDATA[  and fangjian.fangjian_money <= #{params.fangjianMoneyEnd}   ]]>
+            </if>
+            <if test="params.fangjianTypes != null  and params.fangjianTypes != ''">
+                and fangjian.fangjian_types = #{params.fangjianTypes}
+            </if>
+
+            <if test="params.fangjianNumberStart != null  and params.fangjianNumberStart != '' ">
+                <![CDATA[  and fangjian.fangjian_number >= #{params.fangjianNumberStart}   ]]>
+            </if>
+            <if test="params.fangjianNumberEnd != null  and params.fangjianNumberEnd != '' ">
+                <![CDATA[  and fangjian.fangjian_number <= #{params.fangjianNumberEnd}   ]]>
+            </if>
+            <if test="params.fangjianNumber != null  and params.fangjianNumber != '' ">
+                and fangjian.fangjian_number = #{params.fangjianNumber}
+            </if>
+            <if test="params.fangjianClicknumStart != null  and params.fangjianClicknumStart != '' ">
+                <![CDATA[  and fangjian.fangjian_clicknum >= #{params.fangjianClicknumStart}   ]]>
+            </if>
+            <if test="params.fangjianClicknumEnd != null  and params.fangjianClicknumEnd != '' ">
+                <![CDATA[  and fangjian.fangjian_clicknum <= #{params.fangjianClicknumEnd}   ]]>
+            </if>
+            <if test="params.fangjianClicknum != null  and params.fangjianClicknum != '' ">
+                and fangjian.fangjian_clicknum = #{params.fangjianClicknum}
+            </if>
+            <if test=" params.fangjianContent != '' and params.fangjianContent != null and params.fangjianContent != 'null' ">
+                and fangjian.fangjian_content like CONCAT('%',#{params.fangjianContent},'%')
+            </if>
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+            <if test="params.newMoneyStart != null ">
+                <![CDATA[  and yonghu.new_money >= #{params.newMoneyStart}   ]]>
+            </if>
+            <if test="params.newMoneyEnd != null ">
+                <![CDATA[  and yonghu.new_money <= #{params.newMoneyEnd}   ]]>
+            </if>
+            <if test="params.yonghuDeleteStart != null  and params.yonghuDeleteStart != '' ">
+                <![CDATA[  and yonghu.yonghu_delete >= #{params.yonghuDeleteStart}   ]]>
+            </if>
+            <if test="params.yonghuDeleteEnd != null  and params.yonghuDeleteEnd != '' ">
+                <![CDATA[  and yonghu.yonghu_delete <= #{params.yonghuDeleteEnd}   ]]>
+            </if>
+            <if test="params.yonghuDelete != null  and params.yonghuDelete != '' ">
+                and yonghu.yonghu_delete = #{params.yonghuDelete}
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>

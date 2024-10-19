@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.FangjianDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.fangjian_name as fangjianName
+        ,a.fangjian_photo as fangjianPhoto
+        ,a.fangjian_tese as fangjianTese
+        ,a.fangjian_peizhi as fangjianPeizhi
+        ,a.fangjian_shangpin as fangjianShangpin
+        ,a.fangjian_fuwu as fangjianFuwu
+        ,a.fangjian_money as fangjianMoney
+        ,a.fangjian_types as fangjianTypes
+        ,a.fangjian_number as fangjianNumber
+        ,a.fangjian_clicknum as fangjianClicknum
+        ,a.fangjian_content as fangjianContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.FangjianView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM fangjian  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.fangjianName != '' and params.fangjianName != null and params.fangjianName != 'null' ">
+                and a.fangjian_name like CONCAT('%',#{params.fangjianName},'%')
+            </if>
+            <if test=" params.fangjianTese != '' and params.fangjianTese != null and params.fangjianTese != 'null' ">
+                and a.fangjian_tese like CONCAT('%',#{params.fangjianTese},'%')
+            </if>
+            <if test=" params.fangjianPeizhi != '' and params.fangjianPeizhi != null and params.fangjianPeizhi != 'null' ">
+                and a.fangjian_peizhi like CONCAT('%',#{params.fangjianPeizhi},'%')
+            </if>
+            <if test=" params.fangjianShangpin != '' and params.fangjianShangpin != null and params.fangjianShangpin != 'null' ">
+                and a.fangjian_shangpin like CONCAT('%',#{params.fangjianShangpin},'%')
+            </if>
+            <if test=" params.fangjianFuwu != '' and params.fangjianFuwu != null and params.fangjianFuwu != 'null' ">
+                and a.fangjian_fuwu like CONCAT('%',#{params.fangjianFuwu},'%')
+            </if>
+            <if test="params.fangjianMoneyStart != null ">
+                <![CDATA[  and a.fangjian_money >= #{params.fangjianMoneyStart}   ]]>
+            </if>
+            <if test="params.fangjianMoneyEnd != null ">
+                <![CDATA[  and a.fangjian_money <= #{params.fangjianMoneyEnd}   ]]>
+            </if>
+            <if test="params.fangjianTypes != null and params.fangjianTypes != ''">
+                and a.fangjian_types = #{params.fangjianTypes}
+            </if>
+            <if test="params.fangjianNumberStart != null and params.fangjianNumberStart != ''">
+                <![CDATA[  and a.fangjian_number >= #{params.fangjianNumberStart}   ]]>
+            </if>
+            <if test="params.fangjianNumberEnd != null and params.fangjianNumberEnd != ''">
+                <![CDATA[  and a.fangjian_number <= #{params.fangjianNumberEnd}   ]]>
+            </if>
+             <if test="params.fangjianNumber != null and params.fangjianNumber != ''">
+                and a.fangjian_number = #{params.fangjianNumber}
+             </if>
+            <if test="params.fangjianClicknumStart != null and params.fangjianClicknumStart != ''">
+                <![CDATA[  and a.fangjian_clicknum >= #{params.fangjianClicknumStart}   ]]>
+            </if>
+            <if test="params.fangjianClicknumEnd != null and params.fangjianClicknumEnd != ''">
+                <![CDATA[  and a.fangjian_clicknum <= #{params.fangjianClicknumEnd}   ]]>
+            </if>
+             <if test="params.fangjianClicknum != null and params.fangjianClicknum != ''">
+                and a.fangjian_clicknum = #{params.fangjianClicknum}
+             </if>
+            <if test=" params.fangjianContent != '' and params.fangjianContent != null and params.fangjianContent != 'null' ">
+                and a.fangjian_content like CONCAT('%',#{params.fangjianContent},'%')
+            </if>
+
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
